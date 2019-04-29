@@ -66,7 +66,7 @@ namespace CalendarQuickstart.Logic
         }
 
         //creates secondary calendar
-        public static Calendar newCalendar(string name, string location, string despcription, string secundaryCalendarId, string timeZone = "America/Los_Angeles")
+        public static Calendar newCalendar(string name, string location = "", string despcription ="", string secundaryCalendarId="", string timeZone = "America/Los_Angeles")
         {
             Calendar newCalendar = new Calendar
             {

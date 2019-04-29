@@ -18,7 +18,7 @@ namespace CalendarQuickstart
 	class Program
 	{
 
-
+        /*
 		 static void Main(string[] args) {
 
 			Attendee tes = new Attendee();
@@ -32,7 +32,7 @@ namespace CalendarQuickstart
 
 
 		}
-			
+			*/
 
 	}
 

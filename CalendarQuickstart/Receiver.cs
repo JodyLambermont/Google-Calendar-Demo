@@ -9,7 +9,7 @@ namespace CalendarQuickstart
 {
     class ReceiveMessage
     {
-        public static void Main(string[] args)
+        public static void Main(string[] args)  
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.27", UserName = "manager", Password = "ehb", Port = 5672 };
             using (var connection = factory.CreateConnection())
@@ -17,7 +17,7 @@ namespace CalendarQuickstart
             {
                 channel.ExchangeDeclare(exchange: "logs", type: "fanout");
 
-                channel.QueueBind(queue: "Planning", exchange: "logs", routingKey: "");
+                channel.QueueBind(queue: "task_queue", exchange: "logs", routingKey: "task");
                 Console.WriteLine("[*] Waiting for logs.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -63,7 +63,7 @@ namespace CalendarQuickstart
                             break;
                     }
                 };
-                channel.BasicConsume(queue: "Planning", autoAck: true, consumer: consumer);
+                channel.BasicConsume(queue: "task_queue", autoAck: true, consumer: consumer);
                 Console.WriteLine("Press any key to exit");
                 Console.ReadKey(true);
 
@@ -72,14 +72,13 @@ namespace CalendarQuickstart
 
         public void createCalendar(XmlDocument doc)
         {
+            Console.WriteLine("nice");
             XmlNodeList titel = doc.GetElementsByTagName("name");
-            XmlNodeList uuid = doc.GetElementsByTagName("id");
 
             Console.WriteLine(titel[0].InnerText);
-            Console.WriteLine(uuid[0].InnerText);
 
             Calendarss calendarss = new Calendarss(); // connectie maken - service
-            Calendarss.newCalendar(titel[0].InnerText, uuid[0].InnerText);
+            Calendarss.newCalendar(titel[0].InnerText);
         }
 
         public void updateCalendar(XmlDocument doc)
