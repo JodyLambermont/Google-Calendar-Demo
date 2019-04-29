@@ -1,13 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using Google;
-using System.Collections.Generic;
-using Google.Apis.People.v1;
-using Google.Apis.People.v1.Data;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Util.Store;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.PeopleService.v1;
+using Google.Apis.PeopleService.v1.Data;
 using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CalendarQuickstart.Logic
 {
@@ -15,9 +17,9 @@ namespace CalendarQuickstart.Logic
 	public class Attendee
 	{
 		static string ApplicationName = "Google Calendar API .NET Quickstart";
-		string[] Scopes = { PeopleService.Scope.Contacts};
-		public static PeopleService  peopleService;
-		PeopleService Service;
+		string[] Scopes = { Google.Apis.People.v1.PeopleService.Scope.Contacts, Google.Apis.People.v1.PeopleService.Scope.ContactsReadonly, Google.Apis.People.v1.PeopleService.Scope.PlusLogin, Google.Apis.People.v1.PeopleService.Scope.UserinfoProfile};
+		public static PeopleServiceService peopleService;
+		//PeopleService Service;
 
 
 		public Attendee()
@@ -41,13 +43,15 @@ namespace CalendarQuickstart.Logic
 			}
 
 			// Create the service.
-			peopleService = new PeopleService(new BaseClientService.Initializer()
+			peopleService = new PeopleServiceService(new BaseClientService.Initializer()
 			{
 				HttpClientInitializer = credential,
 				ApplicationName = ApplicationName,
 			});
 
 		}
+
+		/**
 		public Attendee(string test)
 		{
 
@@ -69,47 +73,77 @@ namespace CalendarQuickstart.Logic
 				ApplicationName = "APP_NAME",
 			});
 		}
-			//contacts
-			public  bool createAttendees(string voornaam, string achternaam, string uuid)
+	*/
+		//contacts
+		public Google.Apis.PeopleService.v1.Data.Person createAttendees(string voornaam, string middleName, string achternaam, string uuid, string email)
 		{
+			Google.Apis.PeopleService.v1.Data.Person contactToCreate = new Google.Apis.PeopleService.v1.Data.Person();
+			List<Google.Apis.PeopleService.v1.Data.Name> names = new List<Google.Apis.PeopleService.v1.Data.Name>();
+			names.Add(new Google.Apis.PeopleService.v1.Data.Name() { GivenName = voornaam, FamilyName = achternaam, MiddleName = middleName });
+			
+			List<Google.Apis.PeopleService.v1.Data.EmailAddress> emailAddresses = new List<Google.Apis.PeopleService.v1.Data.EmailAddress>() ;
+			emailAddresses.Add(new Google.Apis.PeopleService.v1.Data.EmailAddress() { Value = email });
 
+			List<Google.Apis.PeopleService.v1.Data.UserDefined> uuids = new List<Google.Apis.PeopleService.v1.Data.UserDefined>();
+			uuids.Add(new Google.Apis.PeopleService.v1.Data.UserDefined() { Value = uuid, Key = "UUID" });
 
-			PeopleResource.ConnectionsResource.ListRequest peopleRequest = peopleService.People.Connections.List("people/me");
+			contactToCreate.Names = names;
+			contactToCreate.EmailAddresses = emailAddresses;
+			contactToCreate.UserDefined = uuids;
 
-			peopleRequest.RequestMaskIncludeField = new List<String>() { "person.addresses", "person.names" };
-			ListConnectionsResponse people = peopleRequest.Execute();
-		
+			Google.Apis.PeopleService.v1.PeopleResource.CreateContactRequest request =
+			 new Google.Apis.PeopleService.v1.PeopleResource.CreateContactRequest(peopleService, contactToCreate);
+			Google.Apis.PeopleService.v1.Data.Person createdContact = request.Execute();
+			return createdContact;
 
+		}
 
-
-			peopleRequest.Execute();
-
-			foreach (var per in people.Connections)
+		public void deletePerson(string uuid) {
+			Person per = getPerson(uuid);
+			peopleService.People.DeleteContact(per.ResourceName).Execute();
+		}
+		public Person getPerson(string uuid)
+		{
+			IList<Person> test = getAll();
+			foreach (var t in test)
 			{
-				Console.Write(per.Names[0].DisplayName);
+				foreach (var g in t.UserDefined)
+				{
+					if (g.Key == uuid) {
+						return t;
+					}
+					
+				
+				}
 			}
-			return true;
+			return null;
+			}
+		//not ready
+		public void updatePerson(string uuid, string givenName, string middleName, string familyname) {
+			Person per = getPerson(uuid);
+			foreach (var t in per.Names) {
+				if (givenName != null) { t.GivenName = givenName; }
+				if (familyname != null) { t.FamilyName = familyname; }
+				if (middleName != null) { t.MiddleName = middleName; }						
+			}
+			Person updated = peopleService.People.UpdateContact(per, per.ResourceName)
+				.Execute();
 		}
 
 		//with uuid
-		public bool updateAttendees(string uuid)
-		{
-			//search in contact for contact with uuid^^
-			//update name, mail
-
-			if (true)
-			{
-				return true;
-			}
-			else return false;
-
-		}
-		public void getAll() {
+	//	public bool updateAttendees(string uuid)
+		public IList<Person> getAll() {
+			PeopleResource.ConnectionsResource.ListRequest peopleRequest =
+			peopleService.People.Connections.List("people/me");
+			peopleRequest.PersonFields = "names,emailAddresses,userDefined";
+			ListConnectionsResponse connectionsResponse = peopleRequest.Execute();
+			IList<Person> connections = connectionsResponse.Connections;
 		
+			return connections;
 		}
 	
 
-
+	
 
 	}
 }

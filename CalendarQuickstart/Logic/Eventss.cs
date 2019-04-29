@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace CalendarQuickstart.Logic
 {
+	//test
     public class Eventss
     {
         //don't use primary calendar in deplotment
@@ -36,7 +37,8 @@ namespace CalendarQuickstart.Logic
 
                 if (ev.Location == location) {
 
-                    if (ev.End.DateTime >= start && ev.Start.DateTime <= end || ev.End.DateTime >= end && ev.Start.DateTime <= start) {
+                    if (Math.Max(end.Value.Ticks, ev.End.DateTime.Value.Ticks) - Math.Min(start.Value.Ticks, ev.Start.DateTime.Value.Ticks) < (end.Value.Ticks - start.Value.Ticks) + (ev.End.DateTime.Value.Ticks - ev.Start.DateTime.Value.Ticks)) {
+
                         return false;
 
                     }
@@ -52,10 +54,13 @@ namespace CalendarQuickstart.Logic
             {
                 foreach(var attendee in eventAttendees)
                 {
-                    if (ev.Attendees.Contains(attendee) && (ev.End.DateTime >= start && ev.Start.DateTime <= end || ev.End.DateTime >= end && ev.Start.DateTime <= start)) {
+					if (ev.Attendees.Contains(attendee)){
 
-                        return false;
-                    }
+						if (Math.Max(end.Value.Ticks, ev.End.DateTime.Value.Ticks) - Math.Min(start.Value.Ticks, ev.Start.DateTime.Value.Ticks) < (end.Value.Ticks - start.Value.Ticks) + (ev.End.DateTime.Value.Ticks - ev.Start.DateTime.Value.Ticks)) {
+
+							return false;
+						}
+					}
 
                 }
 
