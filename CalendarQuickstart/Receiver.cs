@@ -30,20 +30,31 @@ namespace CalendarQuickstart
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(message);
                     XmlNodeList xmlList = doc.GetElementsByTagName("Message"); //Represents an ordered collection of nodes.
-                    string messageType = xmlList[0].InnerText;
+                    string messageType = xmlList[0].InnerText.ToLower(); // !!! the message is taken in ToLower
 
                     switch (messageType)
                     {
-                        case "create_event":
+                        case "createevent": // create calendar - still to implement
+                            new ReceiveMessage().createCalendar(doc);
+                            break;
+
+                        case "updateevent": // update calendar - still to implement
+                            new ReceiveMessage().updateCalendar(doc);
+                            break;
+
+                        case "deleteevent": // delete calendar - still to implement
+                            new ReceiveMessage().deleteCalendar(doc);
+                            break;
+
+                        case "createsession": // create event
                             new ReceiveMessage().createEvent(doc);
                             break;
 
-                        case "update_event":
+                        case "updatesession": // update event
                             new ReceiveMessage().updateEvent(doc);
                             break;
 
-
-                        case "delete_event":
+                        case "deletesession": // delete event
                             new ReceiveMessage().deleteEvent(doc);
                             break;
 
@@ -58,6 +69,49 @@ namespace CalendarQuickstart
 
             }
         }
+
+        public void createCalendar(XmlDocument doc)
+        {
+            XmlNodeList titel = doc.GetElementsByTagName("name");
+            XmlNodeList uuid = doc.GetElementsByTagName("id");
+
+            Console.WriteLine(titel[0].InnerText);
+            Console.WriteLine(uuid[0].InnerText);
+
+            Calendarss calendarss = new Calendarss(); // connectie maken - service
+            Calendarss.newCalendar(titel[0].InnerText, uuid[0].InnerText);
+        }
+        
+        public void updateCalendar(XmlDocument doc)
+        {
+            XmlNodeList titel = doc.GetElementsByTagName("name");
+            //XmlNodeList old_titel = doc.GetElementsByTagName("old_titel"); // not really needed
+            XmlNodeList uuid = doc.GetElementsByTagName("id");
+            if (uuid == null) {
+            if( uuid[0].InnerText == String.Empty)
+                {
+                    uuid[0].InnerText = "primary";
+                }
+            }
+
+            Console.WriteLine(titel[0].InnerText); 
+            //Console.WriteLine(old_titel[0].InnerText); // not really needed
+            Console.WriteLine(uuid[0].InnerText);
+
+            Calendarss calendarss = new Calendarss(); // connectie maken - service
+            Calendarss.updateCalendarById(titel[0].InnerText, uuid[0].InnerText);
+        }
+
+        public void deleteCalendar(XmlDocument doc)
+        {
+            XmlNodeList uuid = doc.GetElementsByTagName("id");
+
+            Console.WriteLine(uuid[0].InnerText);
+
+            Calendarss calendarss = new Calendarss(); // connectie maken - service
+            Calendarss.deleteCalendarById(uuid[0].InnerText);
+        }
+
 
         public void createEvent(XmlDocument doc)
         {
@@ -79,7 +133,7 @@ namespace CalendarQuickstart
             DateTime event_end = DateTime.ParseExact(end[0].InnerText, "d/m/yyyy HH:mm:ss", null);
 
             // still to implement create from google cal function with these arguments
-            Eventss newEvent = new Eventss();
+            Eventss eventss = new Eventss(); // connectie maken - service
             //Eventss.newEvent(titel[0].InnerText, local[0].InnerText, desc[0].InnerText, event_begin, event_end, ); //attendee list get all als parameter
 
         }
@@ -107,7 +161,7 @@ namespace CalendarQuickstart
             DateTime event_end = DateTime.ParseExact(end[0].InnerText, "d/m/yyyy HH:mm:ss", null);
 
             // still to implement update from google cal function with these arguments
-            Eventss newEvent = new Eventss();
+            Eventss eventss = new Eventss(); // connectie maken - service
             //Eventss.updateEventByName(old_titel[0].InnerText, titel[0].InnerText, local[0].InnerText, desc[0].InnerText, event_begin, event_end,  ); //attendee list get all als parameter
         }
 
@@ -116,8 +170,7 @@ namespace CalendarQuickstart
             XmlNodeList titel = doc.GetElementsByTagName("titel");
             Console.WriteLine(titel[0].InnerText);
 
-            //still to implement delete from google cal function with these arguments
-            Eventss newEvent = new Eventss();
+            Eventss eventss = new Eventss(); // connectie maken - service
             Eventss.DeleteEventByName(titel[0].InnerText);
         }
 

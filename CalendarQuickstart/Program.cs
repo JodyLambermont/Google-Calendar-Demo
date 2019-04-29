@@ -27,7 +27,7 @@ namespace CalendarQuickstart
 			Attendee at = new Attendee();
 
 			at.createAttendees("jeff", "josh", "123");
-		
+
 			/**
 			//creat calendar
 			Calendarss.newCalendar("demo 1", "somwhere");

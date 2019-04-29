@@ -81,7 +81,7 @@ namespace CalendarQuickstart.Logic
         }
 
         //Cannot change ID!
-        public static Calendar updateCalendarById(string newName, string newLocation = "unknown", string newDescription = "none", string newTimeZone = "America/Los_Angeles", string id = "primary")
+        public static Calendar updateCalendarById(string newName, string id = "primary", string newLocation = "unknown", string newDescription = "none", string newTimeZone = "America/Los_Angeles")
         {
             Calendar calendar = service.Calendars.Get(id).Execute();
 
