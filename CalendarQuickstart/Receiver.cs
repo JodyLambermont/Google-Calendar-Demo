@@ -11,7 +11,7 @@ namespace CalendarQuickstart
     {
         public static void Main(string[] args)
         {
-            var factory = new ConnectionFactory() { HostName = "10.3.56.27", UserName = "", Password = "", Port = 5672 };
+            var factory = new ConnectionFactory() { HostName = "10.3.56.27", UserName = "manager", Password = "ehb", Port = 5672 };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
